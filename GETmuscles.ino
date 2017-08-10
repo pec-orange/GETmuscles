@@ -1,5 +1,6 @@
 #include <Wire.h>
 #include <Servo.h>
+#include <Multiservo.h>
 
 #include <Max3421e.h>
 #include <Usb.h>
@@ -13,6 +14,11 @@ AndroidAccessory acc("Shen dev. std.",
          "1.0",
          "http://www.android.com",
          "0000000012345678");
+
+Multiservo servoArray[18];
+int servoAngle[18];
+
+
 bool connected = false;
 void setup();
 void loop();
@@ -33,10 +39,22 @@ void setup()
 	acc.powerOn();
  
   connected = acc.isConnected();
+
+  for (int i = 0; i < 18; i++) {
+    servoArray[i].attach(i);
+    servoAngle[i] = 0;
+  }
 }
 
 void loop()
 {
+
+  for (int i = 0; i < 18; i++)
+  {
+//    if (servoAngle[i] != 0)
+//      servoArray[i].write(servoAngle[i]);
+  }
+  
 	byte msg[4];
   //Serial.println(connected);
 	if (acc.isConnected()) {
@@ -53,13 +71,8 @@ void loop()
       Serial.print(" "); 
       Serial.println(msg[3]); 
 			if (msg[0] == 0x18) {
-        if (msg[3] == 0) {
-          digitalWrite(LED_PIN, LOW);
-          Serial.println("LED OFF");
-        }
-        else {
-          digitalWrite(LED_PIN, HIGH);
-          Serial.println("LED ON"); 
+        if (msg[1] == 0x24) {
+            servoAngle[msg[2]] = msg[3];
         }
 			} 
 		}
@@ -73,5 +86,5 @@ void loop()
     }
   
   }
-	delay(100);
+	//delay(100);
 }
